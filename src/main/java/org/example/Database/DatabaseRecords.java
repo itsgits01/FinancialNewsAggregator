@@ -25,7 +25,7 @@ public class DatabaseRecords {
                 createRecord(article);
             }
             // createRecord();
-            readRecord();
+            // readRecord();
             // updateRecord();
             // deleteRecord();
 
@@ -52,8 +52,16 @@ public class DatabaseRecords {
     }
 
     private static void createRecord(NewsArticle article) {
+        String checkQuery = "SELECT COUNT(*) FROM news_articles WHERE title = ?";
         String query = "INSERT INTO news_articles (title, url, summary, timePublished, source) VALUES (?, ?, ?, ?, ?)";
         try {
+            preparedStatement = connection.prepareStatement(checkQuery);
+            preparedStatement.setString(1, article.getTitle());
+            resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next() && resultSet.getInt(1) > 0) {
+                return; // Skipping insertion if a duplicate is found
+            }
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, article.getTitle());
             preparedStatement.setString(2, article.getUrl());

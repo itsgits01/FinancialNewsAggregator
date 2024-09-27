@@ -87,17 +87,22 @@ public class AlphaVantageAPI {
     private static final String API_KEY = "IIG98SZEVNYQD9CJ";
     private static final String ALPHA_VANTAGE_URL = "https://www.alphavantage.co/query";
 
+    // Fetch news from AlphaVantage API
     public List<NewsArticle> fetchNews() {
         List<NewsArticle> articles = new ArrayList<>();
         try {
-            CloseableHttpClient httpClient = HttpClients.createDefault();
+            CloseableHttpClient httpClient = HttpClients.createDefault();// Create HttpClient instance
             String function = "NEWS_SENTIMENT";
-            String url = String.format("%s?function=%s&apikey=%s", ALPHA_VANTAGE_URL, function, API_KEY);
+            String url = String.format("%s?function=%s&apikey=%s", ALPHA_VANTAGE_URL, function, API_KEY);// API endpoint
+                                                                                                         // for fetching
+                                                                                                         // news
 
-            HttpGet request = new HttpGet(url);
+            HttpGet request = new HttpGet(url);// Create the HTTP GET request
+
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 String jsonResponse = EntityUtils.toString(response.getEntity());
-                articles = extractNewsData(jsonResponse);
+                articles = extractNewsData(jsonResponse);// Extract news data from the JSON response and store in the
+                                                         // list
             } catch (ParseException e) {
                 throw new RuntimeException(e);
             }
@@ -110,8 +115,8 @@ public class AlphaVantageAPI {
     public List<NewsArticle> extractNewsData(String jsonResponse) {
         List<NewsArticle> articles = new ArrayList<>();
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode root = objectMapper.readTree(jsonResponse);
+            ObjectMapper objectMapper = new ObjectMapper();// Create ObjectMapper instance
+            JsonNode root = objectMapper.readTree(jsonResponse);// Parse the JSON response into a JsonNode tree
             JsonNode newsArray = root.get("feed");
 
             if (newsArray != null && newsArray.isArray()) {
@@ -141,8 +146,5 @@ public class AlphaVantageAPI {
     public static void main(String[] args) {
         AlphaVantageAPI alphaVantageAPI = new AlphaVantageAPI();
         List<NewsArticle> newsArticles = alphaVantageAPI.fetchNews();
-        // for (NewsArticle article : newsArticles) {
-        // System.out.println(article.getTitle());
-        // }
     }
 }
