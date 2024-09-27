@@ -1,9 +1,8 @@
-package org.example;
+package org.example.Database;
 
 import java.sql.*;
 import java.util.List;
 import org.example.APIService.AlphaVantageAPI;
-import org.example.Database.NewsArticle;
 
 public class DatabaseRecords {
     private static final String URL = "jdbc:mysql://localhost:3306/financialNewsAggregator";
