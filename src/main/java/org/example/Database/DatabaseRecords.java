@@ -24,10 +24,6 @@ public class DatabaseRecords {
             for (NewsArticle article : newsArticles) {
                 createRecord(article);
             }
-            // createRecord();
-            // readRecord();
-            // updateRecord();
-            // deleteRecord();
 
         } catch (SQLException e) {
             e.printStackTrace();
