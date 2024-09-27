@@ -74,6 +74,7 @@ public class AlphaVantageAPI {
 
                     // Save each news item to the database
                     newsDAO.saveNews(title, url, summary, timePublished, source);
+
                 }
             } else {
                 System.out.println("No news data available.");
