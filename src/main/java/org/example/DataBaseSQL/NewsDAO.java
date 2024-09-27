@@ -1,5 +1,7 @@
 package org.example.DataBaseSQL;
 
+import org.example.Cache.NewsCache;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +10,8 @@ public class NewsDAO {
 
     private static final String INSERT_NEWS_SQL = "INSERT INTO news (title, url, summary, time_published, source) VALUES (?, ?, ?, ?, ?)";
     private static final String SELECT_ALL_NEWS_SQL = "SELECT * FROM news";
+
+    private final NewsCache newsCache = new NewsCache(); // Internal cache
 
     public void saveNews(String title, String url, String summary, String timePublished, String source) {
         try (Connection conn = DatabaseConnection.getConnection();
@@ -23,6 +27,19 @@ public class NewsDAO {
             preparedStatement.executeUpdate();
             System.out.println("News saved to database!");
 
+            // Cache the news item
+            List<News> cachedNewsList = newsCache.get("topNews");
+            if (cachedNewsList == null) {
+                cachedNewsList = new ArrayList<>();
+            }
+            cachedNewsList.add(new News(title, url, summary, timePublished, source));
+
+            // Store only the top 10 news in the cache
+            if (cachedNewsList.size() > 10) {
+                cachedNewsList.remove(0); // Remove the oldest news
+            }
+            newsCache.put("topNews", cachedNewsList);
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -30,6 +47,12 @@ public class NewsDAO {
 
     public List<News> getAllNews() {
         List<News> newsList = new ArrayList<>();
+
+        // Check if top news is in cache
+        if (newsCache.containsKey("topNews")) {
+            return newsCache.get("topNews"); // Return cached news if available
+        }
+
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(SELECT_ALL_NEWS_SQL);
              ResultSet rs = preparedStatement.executeQuery()) {
@@ -41,13 +64,21 @@ public class NewsDAO {
                 String timePublished = rs.getString("time_published");
                 String source = rs.getString("source");
 
-                // Create a new News object and add it to the list
                 News news = new News(title, url, summary, timePublished, source);
                 newsList.add(news);
             }
+
+            // Cache the top 10 news
+            newsCache.put("topNews", newsList.size() > 10 ? newsList.subList(0, 10) : newsList);
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return newsList;
     }
+
+    public List<News> getCachedNews() {
+        return newsCache.get("topNews"); // Return the cached news list
+    }
+
 }
