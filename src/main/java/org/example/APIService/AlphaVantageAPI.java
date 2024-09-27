@@ -33,7 +33,7 @@ public class AlphaVantageAPI {
                 String jsonResponse = EntityUtils.toString(response.getEntity());
 
                 // Parse the JSON response and extract required fields
-                extractNewsData(jsonResponse);
+                extractNewsData(jsonResponse,100);
 
             } catch (ParseException e) {
                 throw new RuntimeException(e);
@@ -44,7 +44,7 @@ public class AlphaVantageAPI {
     }
 
     // Method to parse the JSON response and extract specific fields
-    private static void extractNewsData(String jsonResponse) {
+    private static void extractNewsData(String jsonResponse, int limit) {
         try {
             // Create ObjectMapper instance
             ObjectMapper objectMapper = new ObjectMapper();
@@ -55,7 +55,12 @@ public class AlphaVantageAPI {
             // Iterate over the articles and extract required fields
             JsonNode newsArray = root.get("feed");
             if (newsArray != null && newsArray.isArray()) {
+                int count = 0;  // To track the number of results
                 for (JsonNode newsItem : newsArray) {
+                    if (count >= limit) {
+                        break;  // Stop when the limit is reached
+                    }
+
                     String title = newsItem.get("title").asText();
                     String url = newsItem.get("url").asText();
                     String summary = newsItem.get("summary").asText();
@@ -69,6 +74,8 @@ public class AlphaVantageAPI {
                     System.out.println("Time Published: " + timePublished);
                     System.out.println("Source: " + source);
                     System.out.println("-----------------------------");
+
+                    count++;  // Increment the counter
                 }
             } else {
                 System.out.println("No news data available.");
@@ -77,4 +84,5 @@ public class AlphaVantageAPI {
             e.printStackTrace();
         }
     }
+
 }
