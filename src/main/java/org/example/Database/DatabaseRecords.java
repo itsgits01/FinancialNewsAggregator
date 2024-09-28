@@ -22,10 +22,17 @@ public class DatabaseRecords {
         }
     }
 
-    public static void main(String[] args) {
+    public DatabaseRecords() {
         try {
             initializeConnection();
-            // connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
             AlphaVantageAPI alphaVantageAPI = new AlphaVantageAPI();
             List<NewsArticle> newsArticles = alphaVantageAPI.fetchNews();
 
@@ -59,7 +66,6 @@ public class DatabaseRecords {
         String checkQuery = "SELECT COUNT(*) FROM news_articles WHERE title = ?";
         String query = "INSERT INTO news_articles (title, url, summary, timePublished, source) VALUES (?, ?, ?, ?, ?)";
         try {
-            initializeConnection();
             preparedStatement = connection.prepareStatement(checkQuery);
             preparedStatement.setString(1, article.getTitle());
             resultSet = preparedStatement.executeQuery();
@@ -82,7 +88,6 @@ public class DatabaseRecords {
     public static List<NewsArticle> readRecord() {
         String query = "SELECT * FROM news_articles";
         try {
-            initializeConnection();
             statement = connection.createStatement();
             resultSet = statement.executeQuery(query);
             List<NewsArticle> readNewsArticles = new ArrayList<>();
