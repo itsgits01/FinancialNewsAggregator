@@ -35,4 +35,15 @@ public class NewsArticle {
     public String getSource() {
         return source;
     }
+
+    @Override
+    public String toString() {
+        return "NewsArticle{" +
+                "title='" + title + '\'' +
+                ", url='" + url + '\'' +
+                ", summary='" + summary + '\'' +
+                ", timePublished='" + timePublished + '\'' +
+                ", source='" + source + '\'' +
+                '}';
+    }
 }

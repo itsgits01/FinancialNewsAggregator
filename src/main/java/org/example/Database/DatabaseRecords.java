@@ -2,6 +2,7 @@ package org.example.Database;
 
 import java.sql.*;
 import java.util.List;
+import java.util.ArrayList;
 import org.example.APIService.AlphaVantageAPI;
 
 public class DatabaseRecords {
@@ -15,9 +16,16 @@ public class DatabaseRecords {
     private static ResultSet resultSet;
     private static PreparedStatement preparedStatement;
 
+    private static void initializeConnection() throws SQLException {
+        if (connection == null || connection.isClosed()) {
+            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        }
+    }
+
     public static void main(String[] args) {
         try {
-            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+            initializeConnection();
+            // connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
             AlphaVantageAPI alphaVantageAPI = new AlphaVantageAPI();
             List<NewsArticle> newsArticles = alphaVantageAPI.fetchNews();
 
@@ -70,25 +78,39 @@ public class DatabaseRecords {
         }
     }
 
-    private static void readRecord() {
+    public static List<NewsArticle> readRecord() {
         String query = "SELECT * FROM news_articles";
         try {
             statement = connection.createStatement();
             resultSet = statement.executeQuery(query);
+            List<NewsArticle> readNewsArticles = new ArrayList<>();
             while (resultSet.next()) {
-                System.out.println(resultSet.getString("title"));
+                NewsArticle readNewsArticle = new NewsArticle(
+                        resultSet.getString("title"),
+                        resultSet.getString("url"),
+                        resultSet.getString("summary"),
+                        resultSet.getString("timePublished"),
+                        resultSet.getString("source"));
+                readNewsArticles.add(readNewsArticle);
             }
-            System.out.println("Records read successfully");
+            return readNewsArticles;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
-    private static void updateRecord() {
-        String query = "UPDATE employees SET salary = ? WHERE EmployeeID = ?";
+    public void storeInDatabase(List<NewsArticle> articles) {
+        for (NewsArticle article : articles) {
+            createRecord(article); // Reuse your existing createRecord method
+        }
     }
 
-    private static void deleteRecord() {
-        String query = "DELETE FROM employees WHERE EmployeeID = ?";
-    }
+    // private static void updateRecord() {
+    // String query = "UPDATE employees SET salary = ? WHERE EmployeeID = ?";
+    // }
+
+    // private static void deleteRecord() {
+    // String query = "DELETE FROM employees WHERE EmployeeID = ?";
+    // }
 }
