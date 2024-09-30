@@ -12,5 +12,5 @@ The Financial News Aggregator is a Java-based application designed to efficientl
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/FinancialNewsAggregator.git
+   https://github.com/itsgits01/FinancialNewsAggregator.git
 
