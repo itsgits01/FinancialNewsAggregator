@@ -65,4 +65,3 @@ The Financial News Aggregator is a Java-based application designed to efficientl
   ## Contributing
    Contributions are welcome! If you'd like to contribute to this project, please fork the repository and submit a pull request. 
 
-
